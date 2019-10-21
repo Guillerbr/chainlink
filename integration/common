@@ -155,6 +155,7 @@ deploy_v05_contracts() {
     export LINK_TOKEN_ADDRESS=`cat $log_path | grep 'Deployed LinkToken at:' | awk '{print$4}'`
     export COORDINATOR_ADDRESS=`cat $log_path | grep 'Deployed Coordinator at:' | awk '{print$4}'`
     export MEAN_AGGREGATOR_ADDRESS=`cat $log_path | grep 'Deployed MeanAggregator at:' | awk '{print$4}'`
+    export GETTER_SETTER_ADDRESS=`cat $log_path | grep 'Deployed GetterSetter at:' | awk '{print$4}``
 }
 launch_echo_server() {
   printf -- "\033[34m%-50s\033[0m" "Checking for local echo server"

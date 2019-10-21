@@ -161,12 +161,10 @@ contract Coordinator is ChainlinkRequestInterface, CoordinatorInterface {
    (bool success, bytes memory message) = abi.decode(response, (bool, bytes));
    if ((!success) && message.length == 0) {
      // Revert with a non-empty message to give user a hint where to look
-     require(success, "initiation failed; empty message"); 
+     require(success, "initiation failed; empty message");
    }
    require(success, string(message));
   }
-
-  event SignatureCheck(address found, address expected);
 
   /**
    * @dev Validates that each signer address matches for the given oracles
@@ -188,7 +186,6 @@ contract Coordinator is ChainlinkRequestInterface, CoordinatorInterface {
         _signatures.rs[i],
         _signatures.ss[i]
       );
-      emit SignatureCheck(signer, _oracles[i]);
       // XXX: require(_oracles[i] == signer, "Invalid oracle signature specified in SA");
       allowedOracles[_serviceAgreementID][_oracles[i]] = true;
     }

@@ -545,14 +545,14 @@ export const executeServiceAgreementBytes = (
   data: any,
 ): any => {
   const types = [
-    'address',
-    'uint256',
-    'bytes32',
-    'address',
-    'bytes4',
-    'uint256',
-    'uint256',
-    'bytes',
+    'address', // sender
+    'uint256', // payment amount
+    'bytes32', // sAId
+    'address', // contract callback address
+    'bytes4',  // contract callback method
+    'uint256', // nonce
+    'uint256', // data version
+    'bytes',   // extra data for oracle
   ]
   const values = [0, 0, sAID, callbackAddr, callbackFunctionId, nonce, 1, data]
   const encoded = abiEncode(types, values)
