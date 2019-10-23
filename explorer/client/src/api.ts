@@ -16,23 +16,23 @@ export async function getJobRuns(
     url.searchParams.set('query', query)
   }
 
-  const r: Response = await fetch(url.toString())
+  const r = await fetch(url.toString())
 
   return r.json()
 }
 
 export async function getJobRun(jobRunId?: string): Promise<JobRun> {
   const url = new URL(`/api/v1/job_runs/${jobRunId}`, base())
-  const r: Response = await fetch(url.toString())
+  const r = await fetch(url.toString())
 
   return r.json()
 }
 
-export async function getOperators(): Promise<number> {
-  const url = new URL('/api/v1/admin/operators', base())
-  const r: Response = await fetch(url.toString())
+export async function getOperators(): Promise<ChainlinkNode[]> {
+  const url = new URL('/api/v1/admin/nodes', base())
+  const r = await fetch(url.toString())
 
-  return r.status
+  return r.json()
 }
 
 export async function signIn(
@@ -40,7 +40,7 @@ export async function signIn(
   password: string,
 ): Promise<number> {
   const url = new URL('/api/v1/admin/login', base())
-  const r: Response = await fetch(url.toString(), {
+  const r = await fetch(url.toString(), {
     method: 'POST',
     headers: {
       [ADMIN_USERNAME_HEADER]: username,
@@ -53,7 +53,7 @@ export async function signIn(
 
 export async function signOut(): Promise<number> {
   const url = new URL('/api/v1/admin/logout', base())
-  const r: Response = await fetch(url.toString(), { method: 'DELETE' })
+  const r = await fetch(url.toString(), { method: 'DELETE' })
 
   return r.status
 }

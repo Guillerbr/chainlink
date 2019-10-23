@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux'
 import { RouteComponentProps } from '@reach/router'
 import {
@@ -10,8 +10,13 @@ import {
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
+import List from '../../../components/Admin/Operators/List'
+import { ChangePageEvent } from '../../../components/Table'
 import { fetchOperators } from '../../../actions/operators'
 import { State as AppState } from '../../../reducers'
+
+const EMPTY_MSG =
+  "We couldn't find any results for your search query. Try again with the job id, run id, requester, requester id or transaction hash"
 
 const styles = ({ breakpoints, spacing }: Theme) =>
   createStyles({
@@ -48,6 +53,12 @@ interface Props
     OwnProps {}
 
 export const Index: React.FC<Props> = ({ classes, fetchOperators }) => {
+  const [currentPage, setCurrentPage] = useState(0)
+  const onChangePage = (_event: ChangePageEvent, page: number) => {
+    setCurrentPage(page)
+    fetchOperators(query, page + 1, rowsPerPage)
+  }
+
   useEffect(() => {
     fetchOperators()
   }, [])
@@ -65,9 +76,13 @@ export const Index: React.FC<Props> = ({ classes, fetchOperators }) => {
             Operators
           </Typography>
 
-          <Typography variant="body1">
-            Add list of operators when working on story [#166832915]
-          </Typography>
+          <List
+            currentPage={currentPage}
+            operators={operators}
+            count={count}
+            onChangePage={onChangePage}
+            emptyMsg={EMPTY_MSG}
+          />
         </Paper>
       </Grid>
     </Grid>
