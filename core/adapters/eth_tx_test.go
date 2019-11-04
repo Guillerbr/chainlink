@@ -16,6 +16,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/jinzhu/gorm"
 	"github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -290,7 +291,10 @@ func TestEthTxAdapter_Perform_FromPendingConfirmations_ConfirmCompletes(t *testi
 
 	tx := cltest.NewTx(cltest.NewAddress(), sentAt)
 	tx.GasPrice = models.NewBig(config.EthGasPriceDefault())
-	require.NoError(t, store.DB.Save(tx).Error)
+	err := store.ORM.RawDB(func(db *gorm.DB) error {
+		return db.Save(tx).Error
+	})
+	require.NoError(t, err)
 	store.AddTxAttempt(tx, tx.EthTx(big.NewInt(2)), sentAt+1)
 	a3, _ := store.AddTxAttempt(tx, tx.EthTx(big.NewInt(3)), sentAt+2)
 	adapter := adapters.EthTx{}
@@ -306,7 +310,7 @@ func TestEthTxAdapter_Perform_FromPendingConfirmations_ConfirmCompletes(t *testi
 	assert.True(t, output.Status().Completed())
 	assert.Equal(t, confirmedHash.String(), output.Result().String())
 
-	tx, err := store.FindTx(tx.ID)
+	tx, err = store.FindTx(tx.ID)
 	require.NoError(t, err)
 	assert.True(t, tx.Confirmed)
 	require.Len(t, tx.Attempts, 2)
@@ -349,7 +353,10 @@ func TestEthTxAdapter_Perform_AppendingTransactionReceipts(t *testing.T) {
 
 	tx := cltest.NewTx(cltest.NewAddress(), sentAt)
 	tx.GasPrice = models.NewBig(config.EthGasPriceDefault())
-	require.NoError(t, store.DB.Save(tx).Error)
+	err := store.ORM.RawDB(func(db *gorm.DB) error {
+		return db.Save(tx).Error
+	})
+	require.NoError(t, err)
 	a, err := store.AddTxAttempt(tx, tx.EthTx(big.NewInt(1)), sentAt)
 	assert.NoError(t, err)
 	adapter := adapters.EthTx{}
