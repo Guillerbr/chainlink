@@ -1,4 +1,5 @@
 import { Actions } from './actions'
+import { Reducer } from 'redux'
 
 export interface State {
   items?: JobRun[]
@@ -6,7 +7,10 @@ export interface State {
 
 const INITIAL_STATE: State = {}
 
-export default (state: State = INITIAL_STATE, action: Actions) => {
+export const jobRunsReducer: Reducer<State, Actions> = (
+  state = INITIAL_STATE,
+  action,
+) => {
   switch (action.type) {
     case 'FETCH_JOB_RUNS_SUCCEEDED':
       return { items: { ...action.data.jobRuns } }
@@ -16,3 +20,5 @@ export default (state: State = INITIAL_STATE, action: Actions) => {
       return state
   }
 }
+
+export default jobRunsReducer

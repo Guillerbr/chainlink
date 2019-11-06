@@ -6,7 +6,8 @@ describe('components/JobRuns/Details', () => {
   it('hides error when not present', () => {
     const chainlinkNode = {}
     const jobRun = { chainlinkNode } as JobRun
-    const wrapper = mount(<Details jobRun={jobRun} />)
+
+    const wrapper = mount(<Details jobRun={jobRun} etherscanHost="" />)
 
     expect(wrapper.text()).not.toContain('Error')
   })
@@ -14,7 +15,7 @@ describe('components/JobRuns/Details', () => {
   it('displays error when present', () => {
     const chainlinkNode = {}
     const jobRun = { error: 'Failure!', chainlinkNode } as JobRun
-    const wrapper = mount(<Details jobRun={jobRun} />)
+    const wrapper = mount(<Details jobRun={jobRun} etherscanHost="" />)
 
     expect(wrapper.text()).toContain('Error')
     expect(wrapper.text()).toContain('Failure!')

@@ -1,18 +1,22 @@
-import reducer, { State } from '../../reducers'
+import reducer, {
+  INITIAL_STATE as initialRootState,
+  AppState,
+} from '../../reducers'
 import { FetchAdminOperatorsSucceededAction } from '../../reducers/actions'
 
-const STATE = {
+const INITIAL_STATE: AppState = {
+  ...initialRootState,
   adminOperators: {
-    items: { 'replace-me': { id: 'replace-me' } },
+    items: [{ 'replace-me': { id: 'replace-me' } }],
   },
 }
 
 describe('reducers/adminOperators', () => {
   it('returns the current state for other actions', () => {
     const action = {} as FetchAdminOperatorsSucceededAction
-    const state = reducer(STATE, action) as State
+    const state = reducer(INITIAL_STATE, action)
 
-    expect(state.adminOperators).toEqual(STATE.adminOperators)
+    expect(state.adminOperators).toEqual(INITIAL_STATE.adminOperators)
   })
 
   describe('FETCH_ADMIN_OPERATORS_SUCCEEDED', () => {
@@ -36,9 +40,9 @@ describe('reducers/adminOperators', () => {
       }
       const action = {
         type: 'FETCH_ADMIN_OPERATORS_SUCCEEDED',
-        data: data,
+        data,
       } as FetchAdminOperatorsSucceededAction
-      const state = reducer(STATE, action) as State
+      const state = reducer(INITIAL_STATE, action)
 
       expect(state.adminOperators).toEqual({
         items: {

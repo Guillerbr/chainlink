@@ -11,7 +11,7 @@ import { fetchJobRuns } from '../../actions/jobRuns'
 import List from '../../components/JobRuns/List'
 import { ChangePageEvent } from '../../components/Table'
 import { State } from '../../reducers'
-import { Query } from '../../reducers/search'
+import { Query } from '../../reducers/query'
 
 const EMPTY_MSG =
   "We couldn't find any results for your search query. Try again with the job id, run id, requester, requester id or transaction hash"
