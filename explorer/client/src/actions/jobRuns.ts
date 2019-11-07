@@ -3,7 +3,7 @@ import * as api from '../api/index'
 import { request } from './helpers'
 
 export const fetchJobRuns = request(
-  'JOB_RUNS',../reducers/query
+  'JOB_RUNS',
   api.v1.jobRuns.getJobRuns,
   json => normalize(json, { endpoint: 'currentPageJobRuns' }),
 )
