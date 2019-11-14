@@ -90,7 +90,7 @@ func TestNotifyExternalInitiator_Notified(t *testing.T) {
 			defer assertCalled()
 
 			test.ExInitr.URL = cltest.WebURL(t, eiMockServer.URL)
-			eia := models.NewExternalInitiatorAuthentication()
+			eia := models.NewAuthToken()
 			ei, err := models.NewExternalInitiator(eia, &test.ExInitr)
 			require.NoError(t, err)
 			err = store.CreateExternalInitiator(ei)
@@ -163,7 +163,7 @@ func TestNotifyExternalInitiator_NotNotified(t *testing.T) {
 			defer eiMockServer.Close()
 
 			test.ExInitr.URL = cltest.WebURL(t, eiMockServer.URL)
-			eia := models.NewExternalInitiatorAuthentication()
+			eia := models.NewAuthToken()
 			ei, err := models.NewExternalInitiator(eia, &test.ExInitr)
 			require.NoError(t, err)
 			err = store.CreateExternalInitiator(ei)

@@ -341,7 +341,9 @@ func (orm *ORM) DeleteExternalInitiator(accessKey string) error {
 }
 
 // FindExternalInitiator finds an external initiator given an authentication request
-func (orm *ORM) FindExternalInitiator(eia *models.ExternalInitiatorAuthentication) (*models.ExternalInitiator, error) {
+func (orm *ORM) FindExternalInitiator(
+	eia *models.AuthToken,
+) (*models.ExternalInitiator, error) {
 	initiator := &models.ExternalInitiator{}
 	err := orm.DB.Where("access_key = ?", eia.AccessKey).Find(initiator).Error
 	if err != nil {

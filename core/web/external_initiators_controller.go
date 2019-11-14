@@ -24,7 +24,7 @@ func (eic *ExternalInitiatorsController) Create(c *gin.Context) {
 		return
 	}
 
-	eia := models.NewExternalInitiatorAuthentication()
+	eia := models.NewAuthToken()
 	if err := c.ShouldBindJSON(eir); err != nil {
 		jsonAPIError(c, http.StatusUnprocessableEntity, err)
 	} else if ei, err := models.NewExternalInitiator(eia, eir); err != nil {

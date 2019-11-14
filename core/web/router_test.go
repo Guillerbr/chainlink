@@ -54,7 +54,7 @@ func TestTokenAuthRequired_TokenCredentials(t *testing.T) {
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
-	eia := models.NewExternalInitiatorAuthentication()
+	eia := models.NewTokenAuthentication()
 	eir := &models.ExternalInitiatorRequest{
 		Name: "bitcoin",
 		URL:  cltest.WebURL(t, "http://localhost:8888"),
@@ -86,7 +86,7 @@ func TestTokenAuthRequired_BadTokenCredentials(t *testing.T) {
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
-	eia := models.NewExternalInitiatorAuthentication()
+	eia := models.NewTokenAuthentication()
 	eir := &models.ExternalInitiatorRequest{
 		Name: "bitcoin",
 		URL:  cltest.WebURL(t, "http://localhost:8888"),

@@ -603,7 +603,7 @@ func CreateJobRunViaExternalInitiator(
 	t testing.TB,
 	app *TestApplication,
 	j models.JobSpec,
-	eia models.ExternalInitiatorAuthentication,
+	eia models.AuthToken,
 	body string,
 ) models.JobRun {
 	t.Helper()

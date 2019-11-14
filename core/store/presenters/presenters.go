@@ -633,7 +633,7 @@ type ExternalInitiatorAuthentication struct {
 // NewExternalInitiatorAuthentication creates an instance of ExternalInitiatorAuthentication.
 func NewExternalInitiatorAuthentication(
 	ei models.ExternalInitiator,
-	eia models.ExternalInitiatorAuthentication,
+	eia models.AuthToken,
 ) *ExternalInitiatorAuthentication {
 	return &ExternalInitiatorAuthentication{
 		Name:           ei.Name,

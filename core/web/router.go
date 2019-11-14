@@ -17,8 +17,6 @@ import (
 
 	"chainlink/core/logger"
 	"chainlink/core/services"
-	"chainlink/core/store"
-	"chainlink/core/store/models"
 	"chainlink/core/store/orm"
 
 	helmet "github.com/danielkov/gin-helmet"
@@ -28,7 +26,6 @@ import (
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/gobuffalo/packr"
-	"github.com/pkg/errors"
 	"github.com/ulule/limiter"
 	mgin "github.com/ulule/limiter/drivers/middleware/gin"
 	"github.com/ulule/limiter/drivers/store/memory"
@@ -52,19 +49,6 @@ const (
 	SessionUserKey = "user"
 	// SessionExternalInitiator is the Externale Initiator key in the session map
 	SessionExternalInitiatorKey = "external_initiator"
-	// ExternalInitiatorAccessKeyHeader is the header name for the access key
-	// used by external initiators to authenticate
-	ExternalInitiatorAccessKeyHeader = "X-Chainlink-EA-AccessKey"
-	// ExternalInitiatorSecretHeader is the header name for the secret used by
-	// external initiators to authenticate
-	ExternalInitiatorSecretHeader = "X-Chainlink-EA-Secret"
-)
-
-var (
-	// ErrorAuthFailed is a generic authentication failed - but not because of
-	// some system failure on our behalf (i.e. HTTP 5xx), more detail is not
-	// given
-	ErrorAuthFailed = errors.New("Authentication failed")
 )
 
 // Router listens and responds to requests to the node for valid paths.
@@ -147,92 +131,6 @@ func secureMiddleware(config orm.ConfigReader) gin.HandlerFunc {
 
 	return secureFunc
 }
-
-func sessionAuth(store *store.Store, c *gin.Context) error {
-	session := sessions.Default(c)
-	sessionID, ok := session.Get(SessionIDKey).(string)
-	if !ok {
-		return ErrorAuthFailed
-	}
-
-	user, err := store.AuthorizedUserWithSession(sessionID)
-	if err != nil {
-		return err
-	}
-	c.Set(SessionUserKey, &user)
-	return nil
-}
-
-func authenticatedUser(c *gin.Context) (*models.User, bool) {
-	obj, ok := c.Get(SessionUserKey)
-	if !ok {
-		return nil, false
-	}
-	return obj.(*models.User), ok
-}
-
-func tokenAuth(store *store.Store, c *gin.Context) error {
-	eia := &models.ExternalInitiatorAuthentication{
-		AccessKey: c.GetHeader(ExternalInitiatorAccessKeyHeader),
-		Secret:    c.GetHeader(ExternalInitiatorSecretHeader),
-	}
-
-	ei, err := store.FindExternalInitiator(eia)
-	if errors.Cause(err) == orm.ErrorNotFound {
-		return ErrorAuthFailed
-	} else if err != nil {
-		return errors.Wrap(err, "finding external intiator")
-	}
-
-	ok, err := models.AuthenticateExternalInitiator(eia, ei)
-	if err != nil {
-		return err
-	}
-
-	if !ok {
-		return ErrorAuthFailed
-	}
-	c.Set(SessionExternalInitiatorKey, ei)
-
-	return nil
-}
-
-func authenticatedEI(c *gin.Context) (*models.ExternalInitiator, bool) {
-	obj, ok := c.Get(SessionExternalInitiatorKey)
-	if !ok {
-		return nil, false
-	}
-	return obj.(*models.ExternalInitiator), ok
-}
-
-func sessionAuthRequired(store *store.Store) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		err := sessionAuth(store, c)
-		if err != nil {
-			c.AbortWithStatus(http.StatusUnauthorized)
-		} else {
-			c.Next()
-		}
-	}
-}
-
-// sessionOrTokenAuthRequired first tries session authentication, then falls back to
-// token authentication, strictly for External Initiators
-func sessionOrTokenAuthRequired(store *store.Store) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		err := sessionAuth(store, c)
-		if err == ErrorAuthFailed {
-			err = tokenAuth(store, c)
-		}
-
-		if err != nil {
-			c.AbortWithStatus(http.StatusUnauthorized)
-		} else {
-			c.Next()
-		}
-	}
-}
-
 func metricRoutes(app services.Application, r *gin.RouterGroup) {
 	group := r.Group("/debug", sessionAuthRequired(app.GetStore()))
 	group.GET("/vars", expvar.Handler())

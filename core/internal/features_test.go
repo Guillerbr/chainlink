@@ -1,6 +1,7 @@
 package internal_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -782,7 +783,7 @@ func TestIntegration_ExternalInitiator(t *testing.T) {
 	require.NoError(t, err)
 	eip := cltest.CreateExternalInitiatorViaWeb(t, app, string(eiCreateJSON))
 
-	eia := &models.ExternalInitiatorAuthentication{
+	eia := &models.AuthToken{
 		AccessKey: eip.AccessKey,
 		Secret:    eip.Secret,
 	}
@@ -813,4 +814,30 @@ func TestIntegration_ExternalInitiator(t *testing.T) {
 	jobRun := cltest.CreateJobRunViaExternalInitiator(t, app, jobSpec, *eia, "")
 	_, err = app.Store.JobRunsFor(jobRun.ID)
 	assert.NoError(t, err)
+}
+
+func TestIntegration_AuthToken(t *testing.T) {
+	// Story: https://www.pivotaltracker.com/n/projects/2129823/stories/168516871
+	app, cleanup := cltest.NewApplication(t)
+	defer cleanup()
+
+	eth := app.MockEthCallerSubscriber(cltest.Strict)
+	eth.Register("eth_chainId", app.Store.Config.ChainID())
+	app.Start()
+
+	// curl -X PATCH
+	// -H 'content-type: application/json'
+	// -H 'X-API-KEY: abcd'
+	// -H `X-API-SECRET: 111111111'
+	// -d `{"ethGasPriceDefault":15000000}`
+	// http://localhost:6688/v2/config
+	url := app.Config.ClientNodeURL() + "/v2/config"
+	headers := make(map[string]string)
+	headers[web.APIKey] = "api-key"
+	headers[web.APISecret] = "api-secret"
+
+	buf := bytes.NewBuffer(nil)
+	resp, cleanup := cltest.UnauthenticatedPatch(t, url, buf, headers)
+	defer cleanup()
+	cltest.AssertServerResponse(t, resp, 200)
 }

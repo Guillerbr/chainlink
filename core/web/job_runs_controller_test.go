@@ -146,7 +146,7 @@ func TestJobRunsController_Create_Wrong_ExternalInitiator(t *testing.T) {
 		Name: "bitcoin",
 		URL:  cltest.WebURL(t, "http://localhost:8888"),
 	}
-	eia := models.NewExternalInitiatorAuthentication()
+	eia := models.NewTokenAuthentication()
 	ei, err := models.NewExternalInitiator(eia, eir)
 	require.NoError(t, err)
 	assert.NoError(t, app.Store.CreateExternalInitiator(ei))
@@ -158,7 +158,7 @@ func TestJobRunsController_Create_Wrong_ExternalInitiator(t *testing.T) {
 		Name: "someCoin",
 		URL:  cltest.WebURL(t, "http://localhost:8888"),
 	}
-	wrongEIA := models.NewExternalInitiatorAuthentication()
+	wrongEIA := models.NewTokenAuthentication()
 	wrongEI, err := models.NewExternalInitiator(wrongEIA, wrongEIR)
 	require.NoError(t, err)
 	assert.NoError(t, app.Store.CreateExternalInitiator(wrongEI))
@@ -181,7 +181,7 @@ func TestJobRunsController_Create_ExternalInitiator_Success(t *testing.T) {
 	app.Start()
 	defer cleanup()
 
-	eia := models.NewExternalInitiatorAuthentication()
+	eia := models.NewTokenAuthentication()
 	eir := &models.ExternalInitiatorRequest{
 		Name: "bitcoin",
 		URL:  cltest.WebURL(t, "http://localhost:8888"),
