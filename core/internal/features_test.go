@@ -816,7 +816,13 @@ func TestIntegration_ExternalInitiator(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestIntegration_AuthToken(t *testing.T) {
+func testIntegration_AuthToken(t *testing.T) {
+	// TODO: create mechanism to generate auth tokens
+	//  amazon uses the Authorization header: https://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html
+	//  strip uses the Basic Auth username: https://stripe.com/docs/api
+	//  info on the HTTP Authorization header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization
+	// TODO: implement authentication logic
+
 	// Story: https://www.pivotaltracker.com/n/projects/2129823/stories/168516871
 	app, cleanup := cltest.NewApplication(t)
 	defer cleanup()
