@@ -10,7 +10,7 @@ import (
 )
 
 func TestNewExternalInitiator(t *testing.T) {
-	eia := models.NewTokenAuthentication()
+	eia := models.NewAuthToken()
 	assert.Len(t, eia.AccessKey, 32)
 	assert.Len(t, eia.Secret, 64)
 
