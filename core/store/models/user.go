@@ -1,20 +1,22 @@
 package models
 
 import (
-	"errors"
 	"regexp"
 	"time"
 
 	"chainlink/core/utils"
+
+	"github.com/pkg/errors"
 )
 
 // User holds the credentials for API user.
 type User struct {
-	Email          string    `json:"email" gorm:"primary_key"`
-	HashedPassword string    `json:"hashedPassword"`
-	CreatedAt      time.Time `json:"createdAt" gorm:"index"`
-	TokenKey       string    `json:"tokenKey"`
-	TokenSecret    string    `json:"tokenSecret"`
+	Email             string    `json:"email" gorm:"primary_key"`
+	HashedPassword    string    `json:"hashedPassword"`
+	CreatedAt         time.Time `json:"createdAt" gorm:"index"`
+	TokenKey          string    `json:"tokenKey"`
+	TokenSalt         string    `json:"tokenSalt"`
+	TokenHashedSecret string    `json:"-"`
 }
 
 // https://davidcel.is/posts/stop-validating-email-addresses-with-regex/
@@ -72,4 +74,16 @@ func NewSession() Session {
 type ChangePasswordRequest struct {
 	OldPassword string `json:"oldPassword"`
 	NewPassword string `json:"newPassword"`
+}
+
+func (u *User) GenerateAuthToken() (*AuthToken, error) {
+	tAuth := NewAuthToken()
+	var salt string
+	hashedSecret, err := HashedSecret(tAuth, salt)
+	if err != nil {
+		return nil, errors.Wrap(err, "user")
+	}
+	u.TokenKey = tAuth.AccessKey
+	u.TokenHashedSecret = hashedSecret
+	return tAuth, nil
 }
