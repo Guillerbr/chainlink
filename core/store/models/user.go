@@ -1,6 +1,7 @@
 package models
 
 import (
+	"crypto/subtle"
 	"regexp"
 	"time"
 
@@ -76,14 +77,24 @@ type ChangePasswordRequest struct {
 	NewPassword string `json:"newPassword"`
 }
 
+// GenerateAuthToken ...
 func (u *User) GenerateAuthToken() (*AuthToken, error) {
-	tAuth := NewAuthToken()
-	var salt string
-	hashedSecret, err := HashedSecret(tAuth, salt)
+	token := NewAuthToken()
+	salt := utils.NewSecret(utils.DefaultSecretSize)
+	hashedSecret, err := HashedSecret(token, salt)
 	if err != nil {
 		return nil, errors.Wrap(err, "user")
 	}
-	u.TokenKey = tAuth.AccessKey
+	u.TokenKey = token.AccessKey
 	u.TokenHashedSecret = hashedSecret
-	return tAuth, nil
+	return token, nil
+}
+
+// AuthenticateUserByToken ...
+func AuthenticateUserByToken(token *AuthToken, user *User) (bool, error) {
+	hashedSecret, err := HashedSecret(token, user.TokenSalt)
+	if err != nil {
+		return false, err
+	}
+	return subtle.ConstantTimeCompare([]byte(hashedSecret), []byte(user.TokenHashedSecret)) == 1, nil
 }
